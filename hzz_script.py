@@ -16,6 +16,8 @@ import infofile # local file containing cross-sections, sums of weights, dataset
 parser = argparse.ArgumentParser(description='Runs the HZZ analysis on data')
 parser.add_argument('--fraction', default=1, help='Fraction of data used, use less than 1 to make it faster')
 parser.add_argument('--plot', default=False, help='Set to True to plot data')
+parser.add_argument('--start', default = 0, help='Start proportion in tree.iterate')
+parser.add_argument('--end', default = 1, help='End proportion in tree.iterate')
 
 args = parser.parse_args()
 #===================================================================================
@@ -29,7 +31,9 @@ args = parser.parse_args()
 #lumi = 4.7 # fb-1 # data_D only
 lumi = 10 # fb-1 # data_A,data_B,data_C,data_D
 
-fraction = args.fraction # reduce this is if you want the code to run quicker
+fraction = float(args.fraction) # reduce this is if you want the code to run quicker
+start_proportion = float(args.start)
+end_proportion = float(args.end)
                                                                                                                                   
 #tuple_path = "Input/4lep/" # local 
 tuple_path = "https://atlas-opendata.web.cern.ch/atlas-opendata/samples/2020/4lep/" # web address
@@ -112,6 +116,8 @@ def read_file(path,sample):
     # open the tree called mini using a context manager (will automatically close files/resources)
     with uproot.open(path + ":mini") as tree:
         numevents = tree.num_entries # number of events
+        start_point = int(start_proportion * numevents)
+        end_point = int(end_proportion * numevents)
         nIn = numevents # number of events in this batch
         nOut = [0]*numevents
         i = 0
@@ -125,7 +131,8 @@ def read_file(path,sample):
                                   'scaleFactor_ELE','scaleFactor_MUON',
                                   'scaleFactor_LepTRIGGER'], # variables to calculate Monte Carlo weight
                                  library="ak", # choose output type as awkward array
-                                 entry_stop=numevents*fraction): # process up to numevents*fraction
+                                 entry_start = start_point, # start entry at
+                                 entry_stop= end_point): # process up to numevents*fraction
 
             if 'data' not in sample: # only do this for Monte Carlo simulation files
                 # multiply all Monte Carlo weights and scale factors together to give total weight
