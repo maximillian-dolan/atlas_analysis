@@ -14,9 +14,8 @@ import infofile # local file containing cross-sections, sums of weights, dataset
 # Command line arguments
 
 parser = argparse.ArgumentParser(description='Runs the HZZ analysis on data')
-parser.add_argument('--fraction', default=0.7, help='Fraction of data used, use less than 1 to make it faster')
-parser.add_argument('--plot', default=0, help='1 to plot data')
-parser.add_argument('--test', default = 'hi', help = 'test')
+parser.add_argument('--fraction', default=1, help='Fraction of data used, use less than 1 to make it faster')
+parser.add_argument('--plot', default=False, help='Set to True to plot data')
 
 args = parser.parse_args()
 #===================================================================================
@@ -307,7 +306,7 @@ def plot_data(data):
     # draw the legend
     main_axes.legend( frameon=False ) # no box around the legend
     
-    return
+    plt.show()
 
 #===================================================================================
 
@@ -317,7 +316,7 @@ def main():
     elapsed = time.time() - start # time after whole processing
     print("Time taken: "+str(round(elapsed,1))+"s") # print total time taken to process every file
 
-    if args.plot == 1:
+    if args.plot == 'True':
         plot_data(data)
 
 main()
