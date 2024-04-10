@@ -50,7 +50,6 @@ def count_file(path,sample):
     
     return count # return array containing events passing all cuts
 
-
 # Define function to get data from files
 def get_data_from_files():
 
@@ -87,6 +86,7 @@ def add_dictionaries(dict1, dict2):
 
 def split_dictionary(original_dict, n):
     output_dicts = [{} for _ in range(n+1)]
+    zeros, ones = {},{}
 
     for category, sub_dict in original_dict.items():
         for key, value in sub_dict.items():
@@ -99,8 +99,11 @@ def split_dictionary(original_dict, n):
             for i in range(remaining):
                 split_values[i] += 1
 
-            # Set initial dictionary of start points
-            output_dicts[0].setdefault(category, {})[key] = 0 * len(split_values)
+            # Set initial dictionary of start points and create dictionary of 1s
+            zeros.setdefault(category, {})[key] = 0
+            ones.setdefault(category, {})[key] = 1
+
+            output_dicts[0] = zeros
 
             # Assigning split values to output dictionaries
             for i in range(1,n+1):
@@ -110,12 +113,20 @@ def split_dictionary(original_dict, n):
     for i in range(1,n+1):
         output_dicts[i] = add_dictionaries(output_dicts[i-1],output_dicts[i])
 
-    # Final validation check to ensure all dictionaries add up t original
+    # Create start and end value dictionaries
+    start_dicts = output_dicts[:-1]
+    end_dicts = output_dicts[1:]
+
+    # Make start values 1 more than previous end values    
+    for i in range(1,n):
+        start_dicts[i] = add_dictionaries(start_dicts[i], ones)
+
+    # Final validation check to ensure all dictionaries add up to original
     if output_dicts[n] == original_dict:
-        return output_dicts
-    
+        return start_dicts, end_dicts
+
     else:
-        print('End verification failed')
+        raise ValueError('End verification failed')
 
 def main():
 
@@ -129,10 +140,15 @@ def main():
     else:
         raise ValueError('number of workers must be an integer')
 
-    output_dicts = split_dictionary(counts, n)
+    start_dicts, end_dicts = split_dictionary(counts, n)
 
     # Printing the results
-    for i, output_dict in enumerate(output_dicts):
+    print('starts')
+    for i, output_dict in enumerate(start_dicts):
+        print(f"Dictionary {i+1}: {output_dict}\n")
+    print('========================================')
+    print('ends')
+    for i, output_dict in enumerate(end_dicts):
         print(f"Dictionary {i+1}: {output_dict}\n")
 
 main()
