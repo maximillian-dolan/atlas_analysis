@@ -1,7 +1,12 @@
 import uproot # for reading .root files
 import time # to measure time to analyse
+import argparse # for passing command line arguments
 
 import infofile # local file containing cross-sections, sums of weights, dataset IDs
+
+parser = argparse.ArgumentParser(description='Defines dictionaries with start and end points for each worker')
+parser.add_argument('--number_workers', default=1, help='Number of workers being used')
+args = parser.parse_args()
 
 #===================================================================================
 # Where to access the input files
@@ -66,12 +71,68 @@ def get_data_from_files():
 
 #===================================================================================
 
+# Define funciton to add nested dictionaries together
+def add_dictionaries(dict1, dict2):
+    result = {}
+    for key in dict1.keys():
+        if key in dict2:
+            if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                # Recursively call for nested dictionaries
+                result[key] = add_dictionaries(dict1[key], dict2[key])
+            else:
+                # Add values if they are not nested dictionaries
+                result[key] = dict1[key] + dict2[key]
+
+    return result
+
+def split_dictionary(original_dict, n):
+    output_dicts = [{} for _ in range(n+1)]
+
+    for category, sub_dict in original_dict.items():
+        for key, value in sub_dict.items():
+
+            # Splitting the value into n parts
+            split_values = [value // n] * n  
+            remaining = value % n 
+
+            # Distributing the remainder among the first 'remaining' dictionaries
+            for i in range(remaining):
+                split_values[i] += 1
+
+            # Set initial dictionary of start points
+            output_dicts[0].setdefault(category, {})[key] = 0 * len(split_values)
+
+            # Assigning split values to output dictionaries
+            for i in range(1,n+1):
+                output_dicts[i].setdefault(category, {})[key] = split_values[i-1]
+    
+    # Make dictionaries to be cumulative
+    for i in range(1,n+1):
+        output_dicts[i] = add_dictionaries(output_dicts[i-1],output_dicts[i])
+
+    # Final validation check to ensure all dictionaries add up t original
+    if output_dicts[n] == original_dict:
+        return output_dicts
+    
+    else:
+        print('End verification failed')
+
 def main():
 
     start = time.time() # time at start of whole processing
     counts = get_data_from_files() # process all files
     elapsed = time.time() - start # time after whole processing
     print("Time taken: "+str(round(elapsed,1))+"s") # print total time taken to process every file
-    print(counts)
+
+    if float(args.number_workers).is_integer():
+        n = int(args.number_workers)  # Number of output dictionaries
+    else:
+        raise ValueError('number of workers must be an integer')
+
+    output_dicts = split_dictionary(counts, n)
+
+    # Printing the results
+    for i, output_dict in enumerate(output_dicts):
+        print(f"Dictionary {i+1}: {output_dict}\n")
 
 main()
