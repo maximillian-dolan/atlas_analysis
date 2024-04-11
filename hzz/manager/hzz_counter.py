@@ -1,6 +1,7 @@
 import uproot # for reading .root files
 import time # to measure time to analyse
 import argparse # for passing command line arguments
+import pickle
 
 import infofile # local file containing cross-sections, sums of weights, dataset IDs
 
@@ -143,12 +144,22 @@ def main():
     start_dicts, end_dicts = split_dictionary(counts, n)
 
     # Printing the results
-    print('starts')
+    print('======')
+    print('starts:')
     for i, output_dict in enumerate(start_dicts):
         print(f"Dictionary {i+1}: {output_dict}\n")
     print('========================================')
     print('ends')
     for i, output_dict in enumerate(end_dicts):
         print(f"Dictionary {i+1}: {output_dict}\n")
+
+    # Save dictionaries
+    with open('./worker/starts.pkl', 'wb') as sd:
+        pickle.dump(start_dicts, sd)
+        print('start points saved')
+    
+    with open('./worker/ends.pkl', 'wb') as ed:
+        pickle.dump(end_dicts, ed)
+        print('end points saved')
 
 main()
