@@ -44,6 +44,9 @@ GeV = 1.0
 # Get a list of all '.pkl' files in the current directory
 pkl_files = [file for file in os.listdir('./manager') if file.endswith('.pkl')]
 
+if len(pkl_files) == 0:
+    raise ImportError('No detected data files')
+
 ak_arrays = {}
 ak_list = []
 # Import each pickle file
