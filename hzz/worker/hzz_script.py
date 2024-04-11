@@ -7,6 +7,8 @@ import numpy as np # for numerical calculations such as histogramming
 import matplotlib.pyplot as plt # for plotting
 from matplotlib.ticker import AutoMinorLocator # for minor ticks
 import argparse # for passing command line arguments
+import pickle
+from IPython.display import clear_output
 
 import infofile # local file containing cross-sections, sums of weights, dataset IDs
 
@@ -14,12 +16,39 @@ import infofile # local file containing cross-sections, sums of weights, dataset
 # Command line arguments
 
 parser = argparse.ArgumentParser(description='Runs the HZZ analysis on data')
-parser.add_argument('--fraction', default=1, help='Fraction of data used, use less than 1 to make it faster')
 parser.add_argument('--plot', default=False, help='Set to True to plot data')
-parser.add_argument('--start', default = 0, help='Start proportion in tree.iterate')
-parser.add_argument('--end', default = 1, help='End proportion in tree.iterate')
+parser.add_argument('--rank', default = 0, help = 'which division node is doing' )
 
 args = parser.parse_args()
+#===================================================================================
+# Load in start and end points
+
+with open('worker/starts.pkl', 'rb') as sd:
+    start_dicts = pickle.load(sd)
+
+with open('worker/ends.pkl', 'rb') as ed:
+    end_dicts = pickle.load(ed)
+
+rank = int(args.rank)
+
+if len(start_dicts) != len(end_dicts):
+    raise IndexError('Start and End dictionaries are not the same length')
+
+if rank >= len(start_dicts):
+    raise ImportError('This division does not exist')
+
+start_dict = start_dicts[rank]
+end_dict = end_dicts[rank]
+
+print('========================================')
+print('starts:')
+for i, output_dict in enumerate(start_dicts):
+    print(f"Dictionary {i+1}: {output_dict}\n")
+print('=====')
+print('ends:')
+for i, output_dict in enumerate(end_dicts):
+    print(f"Dictionary {i+1}: {output_dict}\n")
+print('========================================')
 #===================================================================================
 # Define variables
 
@@ -30,10 +59,6 @@ args = parser.parse_args()
 #lumi = 2.9 # fb-1 # data_C only
 #lumi = 4.7 # fb-1 # data_D only
 lumi = 10 # fb-1 # data_A,data_B,data_C,data_D
-
-fraction = float(args.fraction) # reduce this is if you want the code to run quicker
-start_proportion = float(args.start)
-end_proportion = float(args.end)
                                                                                                                                   
 #tuple_path = "Input/4lep/" # local 
 tuple_path = "https://atlas-opendata.web.cern.ch/atlas-opendata/samples/2020/4lep/" # web address
@@ -108,17 +133,18 @@ def cut_lep_type(lep_type):
 # Data reading functions
 
 # Define function to read and process individual files
-def read_file(path,sample):
+def read_file(path,sample,s):
     start = time.time() # start the clock
-    print("\tProcessing: "+sample) # print which sample is being processed
+    start_point = start_dict[s][sample]
+    end_point = end_dict[s][sample]
+    print("\tProcessing: "+sample,f' - start point: {start_point} , end point: {end_point}') # print which sample is being processed
     data_all = [] # define empty list to hold all data for this sample
+    nIn = end_point-start_point+1 # +1 as its inclusive
     
     # open the tree called mini using a context manager (will automatically close files/resources)
+    counter=0
     with uproot.open(path + ":mini") as tree:
         numevents = tree.num_entries # number of events
-        start_point = int(start_proportion * numevents)
-        end_point = int(end_proportion * numevents)
-        nIn = numevents # number of events in this batch
         nOut = [0]*numevents
         i = 0
         
@@ -138,6 +164,12 @@ def read_file(path,sample):
                 # multiply all Monte Carlo weights and scale factors together to give total weight
                 data['totalWeight'] = calc_weight(xsec_weight, data)
 
+            #if s == 'Signal ($m_H$ = 125 GeV)':
+             #   if counter%100 ==0:
+              #      print(counter) 
+               # counter +=1
+
+
             # cut on lepton charge using the function cut_lep_charge defined above
             data = data[~cut_lep_charge(data.lep_charge)]
 
@@ -146,7 +178,7 @@ def read_file(path,sample):
 
             # calculation of 4-lepton invariant mass using the function calc_mllll defined above
             data['mllll'] = calc_mllll(data.lep_pt, data.lep_eta, data.lep_phi, data.lep_E)
-
+            
             # array contents can be printed at any stage like this
             #print(data)
 
@@ -163,7 +195,7 @@ def read_file(path,sample):
             i+=1
             
         elapsed = time.time() - start # time taken to process
-        print("\t\t nIn: "+str(nIn)+",\t nOut: \t"+str(sum(nOut))+"\t in "+str(round(elapsed,1))+"s") # events before and after
+        print("\t\t nIn: "+str(nIn)+'/'+str(numevents)+",\t nOut: \t"+str(sum(nOut))+"\t in "+str(round(elapsed,1))+"s") # events before and after
     
     return ak.concatenate(data_all) # return array containing events passing all cuts
 
@@ -180,7 +212,7 @@ def get_data_from_files():
             else: # MC prefix
                 prefix = "MC/mc_"+str(infofile.infos[val]["DSID"])+"."
             fileString = tuple_path+prefix+val+".4lep.root" # file name to open
-            temp = read_file(fileString,val) # call the function read_file defined below
+            temp = read_file(fileString,val,s) # call the function read_file defined below
             frames.append(temp) # append array returned from read_file to list of awkward arrays
         data[s] = ak.concatenate(frames) # dictionary entry is concatenated awkward arrays
     
