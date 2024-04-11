@@ -2,12 +2,30 @@ import uproot # for reading .root files
 import time # to measure time to analyse
 import argparse # for passing command line arguments
 import pickle
+import os
 
 import infofile # local file containing cross-sections, sums of weights, dataset IDs
 
 parser = argparse.ArgumentParser(description='Defines dictionaries with start and end points for each worker')
 parser.add_argument('--number_workers', default=1, help='Number of workers being used')
 args = parser.parse_args()
+
+#===================================================================================
+# Remove current .pkl files
+
+# Directory path
+directory = './manager/'
+
+# List all files in the directory
+files = os.listdir(directory)
+
+# Filter files ending with '.pkl'
+pkl_files = [file for file in files if file.endswith('.pkl')]
+
+# Remove each .pkl file
+for pkl_file in pkl_files:
+    file_path = os.path.join(directory, pkl_file)
+    os.remove(file_path)
 
 #===================================================================================
 # Where to access the input files
