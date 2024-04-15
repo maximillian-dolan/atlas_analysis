@@ -5,7 +5,7 @@ FROM python:3
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+COPY . .
 
 # Install needed packages
 RUN pip install awkward
@@ -14,4 +14,4 @@ RUN pip install vector
 RUN pip install argparse
 
 # Run hzz_collector.py when the container launches
-CMD ["python", "hzz_counter.py"]
+CMD ["python", "hzz_script.py"]

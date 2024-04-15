@@ -10,15 +10,6 @@ services:
     networks:
       - hzz_network
 
-  collector:
-    build:
-      context: ./collector
-      dockerfile: Dockerfile
-    volumes:
-      - ./db_data:/app/data
-    networks:
-      - hzz_network
-
   worker:
     build:
       context: ./worker
@@ -27,6 +18,20 @@ services:
       - ./db_data:/app/data
     networks:
       - hzz_network
+    depends_on:
+      - counter
+
+  collector:
+    build:
+      context: ./collector
+      dockerfile: Dockerfile
+    volumes:
+      - ./db_data:/app/data
+    networks:
+      - hzz_network
+    depends_on:
+      - counter
+      - worker
 
 volumes:
   db_data:

@@ -5,7 +5,7 @@ FROM python:3
 WORKDIR /app
 
 # Copy the current directory contents into the container at /app
-COPY . /app
+COPY . .
 
 # Install needed packages
 RUN pip install awkward
