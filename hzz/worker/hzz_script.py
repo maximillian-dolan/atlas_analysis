@@ -18,10 +18,10 @@ args = parser.parse_args()
 #===================================================================================
 # Load in start and end points
 
-with open('worker/starts.pkl', 'rb') as sd:
+with open('data/starts.pkl', 'rb') as sd:
     start_dicts = pickle.load(sd)
 
-with open('worker/ends.pkl', 'rb') as ed:
+with open('data/ends.pkl', 'rb') as ed:
     end_dicts = pickle.load(ed)
 
 rank = int(args.rank)
@@ -226,7 +226,7 @@ def main():
     elapsed = time.time() - start # time after whole processing
     print("Time taken: "+str(round(elapsed,1))+"s") # print total time taken to process every file
 
-    with open(f'./collector/data_{rank}.pkl', 'wb') as d:
+    with open(f'./data/data_{rank}.pkl', 'wb') as d:
         pickle.dump(data, d)
         print(f'data from {rank} saved')
 

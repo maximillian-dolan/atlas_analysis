@@ -42,7 +42,7 @@ GeV = 1.0
 # Import and process data
 
 # Get a list of all '.pkl' files in the current directory
-pkl_files = [file for file in os.listdir('./collector') if file.endswith('.pkl')]
+pkl_files = [file for file in os.listdir('./data') if file.endswith('.pkl') and file.startswith('data')]
 
 if len(pkl_files) == 0:
     raise ImportError('No detected data files')
@@ -51,7 +51,7 @@ ak_arrays = {}
 ak_list = []
 # Import each pickle file
 for pkl_file in pkl_files:
-    pkl_file_path = f'collector/{pkl_file}'
+    pkl_file_path = f'data/{pkl_file}'
 
     with open(pkl_file_path, 'rb') as file:
         var_name = f'data_{pkl_file_path[-5]}'
