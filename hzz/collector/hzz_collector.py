@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
 import os
 import numpy as np
+import time
 
 #===================================================================================
 # Define variables
@@ -38,6 +39,39 @@ samples = {'data': {'list' : ['data_A','data_B','data_C','data_D'],
 # Set units
 MeV = 0.001
 GeV = 1.0
+
+#===================================================================================
+# Waits to start until start and end dictionaries been produced
+
+# Check starts and ends exist
+def check_start_file():
+    return os.path.exists('data/starts.pkl') and os.path.exists('data/ends.pkl')
+
+# Wait until both files are present
+while not check_start_file():
+    time.sleep(1)
+
+# Finds out how many data files there should be
+with open('data/starts.pkl', 'rb') as sd:
+    start_dicts = pickle.load(sd)
+
+n = len(start_dicts)
+
+# Creates list of expected files
+files_list = []
+for i in range(n):
+    name = f'data/data_{i}.pkl'
+    files_list.append(name)
+
+# Check files in list exist
+def check_files(file_list):
+    return all(os.path.exists(file) for file in file_list)
+
+# Wait until all files in the list exist:
+while not check_files(files_list):
+    time.sleep(1)
+
+time.sleep(1) # To correct occasional error caused by script running fraction of a second too early 
 #===================================================================================
 # Import and process data
 
@@ -201,10 +235,12 @@ def plot_data(data):
 
     # draw the legend
     main_axes.legend( frameon=False ) # no box around the legend
-    
+
+    plt.savefig('data/graph.png')
     plt.show()
 
 def main(): 
+    print('Collecting data')
     plot_data(result_dict)
 
 main()

@@ -12,6 +12,8 @@ RUN pip install awkward
 RUN pip install uproot
 RUN pip install vector
 RUN pip install argparse
+RUN pip install aiohttp
+RUN pip install requests
 
 # Run hzz_collector.py when the container launches
 CMD ["python", "hzz_script.py"]

@@ -162,7 +162,7 @@ def main():
     start_dicts, end_dicts = split_dictionary(counts, n)
 
     #Printing the results
-    print('======')
+    print('========================================')
     print('starts:')
     for i, output_dict in enumerate(start_dicts):
         print(f"Dictionary {i+1}: {output_dict}\n")
@@ -170,6 +170,7 @@ def main():
     print('ends')
     for i, output_dict in enumerate(end_dicts):
         print(f"Dictionary {i+1}: {output_dict}\n")
+    print('========================================')
 
     # Save dictionaries
     with open('./data/starts.pkl', 'wb') as sd:

@@ -5,6 +5,7 @@ import time # to measure time to analyse
 import math # for mathematical functions such as square root
 import argparse # for passing command line arguments
 import pickle
+import os
 
 import infofile # local file containing cross-sections, sums of weights, dataset IDs
 
@@ -15,6 +16,17 @@ parser = argparse.ArgumentParser(description='Runs the HZZ analysis on data')
 parser.add_argument('--rank', default = 0, help = 'which division node is doing' )
 
 args = parser.parse_args()
+
+#===================================================================================
+# Waits to start until start and end dictionaries been produced
+
+# Function to check for the presence of files
+def check_files():
+    return os.path.exists('data/starts.pkl') and os.path.exists('data/ends.pkl')
+
+# Wait until both files are present
+while not check_files():
+    time.sleep(1)
 #===================================================================================
 # Load in start and end points
 

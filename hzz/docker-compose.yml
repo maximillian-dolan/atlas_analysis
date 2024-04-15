@@ -6,7 +6,7 @@ services:
       context: ./counter
       dockerfile: Dockerfile
     volumes:
-      - ./db_data:/app/data
+      - ./data:/app/data
     networks:
       - hzz_network
 
@@ -15,7 +15,7 @@ services:
       context: ./worker
       dockerfile: Dockerfile
     volumes:
-      - ./db_data:/app/data
+      - ./data:/app/data
     networks:
       - hzz_network
     depends_on:
@@ -26,7 +26,7 @@ services:
       context: ./collector
       dockerfile: Dockerfile
     volumes:
-      - ./db_data:/app/data
+      - ./data:/app/data
     networks:
       - hzz_network
     depends_on:
@@ -34,7 +34,7 @@ services:
       - worker
 
 volumes:
-  db_data:
+  data:
     driver: local
 
 networks:
