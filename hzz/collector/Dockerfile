@@ -10,9 +10,7 @@ COPY . /app
 # Install needed packages
 RUN pip install awkward
 RUN pip install uproot
-RUN pip install glob
 RUN pip install matplotlib
-RUN pip install os
 RUN pip install numpy
 
 # Run hzz_collector.py when the container launches

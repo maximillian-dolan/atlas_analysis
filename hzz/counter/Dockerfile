@@ -9,10 +9,9 @@ COPY . .
 
 # Install needed packages
 RUN pip install uproot
-RUN pip install time
 RUN pip install argparse
-RUN pip install pickle
-RUN pip install os
+RUN pip install aiohttp
+RUN pip install requests
 
 # Run hzz_collector.py when the container launches
 CMD ["python", "hzz_counter.py"]
