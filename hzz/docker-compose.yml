@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  counter:
+    build:
+      context: ./counter
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+    networks:
+      - hzz_network
+
+  collector:
+    build:
+      context: ./collector
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+    networks:
+      - hzz_network
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    volumes:
+      - ./data:/app/data
+    networks:
+      - hzz_network
+
+networks:
+  hzz_network:
+    driver: bridge
+
