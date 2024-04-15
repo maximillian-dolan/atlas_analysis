@@ -36,15 +36,15 @@ if rank >= len(start_dicts):
 start_dict = start_dicts[rank]
 end_dict = end_dicts[rank]
 
-print('========================================')
-print('starts:')
-for i, output_dict in enumerate(start_dicts):
-    print(f"Dictionary {i+1}: {output_dict}\n")
-print('=====')
-print('ends:')
-for i, output_dict in enumerate(end_dicts):
-    print(f"Dictionary {i+1}: {output_dict}\n")
-print('========================================')
+#print('========================================')
+#print('starts:')
+#for i, output_dict in enumerate(start_dicts):
+    #print(f"Dictionary {i+1}: {output_dict}\n")
+#print('=====')
+#print('ends:')
+#for i, output_dict in enumerate(end_dicts):
+    #print(f"Dictionary {i+1}: {output_dict}\n")
+#print('========================================')
 #===================================================================================
 # Define variables
 
@@ -217,12 +217,16 @@ def get_data_from_files():
 #===================================================================================
 
 def main():
+    print('=======================')
+    print(f'Processing node {rank}')
+    print('=======================')
+
     start = time.time() # time at start of whole processing
     data = get_data_from_files() # process all files
     elapsed = time.time() - start # time after whole processing
     print("Time taken: "+str(round(elapsed,1))+"s") # print total time taken to process every file
 
-    with open(f'./manager/data_{rank}.pkl', 'wb') as d:
+    with open(f'./collector/data_{rank}.pkl', 'wb') as d:
         pickle.dump(data, d)
         print(f'data from {rank} saved')
 
