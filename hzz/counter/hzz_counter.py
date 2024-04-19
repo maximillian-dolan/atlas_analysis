@@ -14,7 +14,7 @@ args = parser.parse_args()
 # Remove current .pkl files
 
 # Directory path
-directory = './data/'
+directory = './data'
 
 # List all files in the directory
 files = os.listdir(directory)
@@ -173,11 +173,11 @@ def main():
     print('========================================')
 
     # Save dictionaries
-    with open('./data/starts.pkl', 'wb') as sd:
+    with open('data/starts.pkl', 'wb') as sd:
         pickle.dump(start_dicts, sd)
         print('start points saved')
     
-    with open('./data/ends.pkl', 'wb') as ed:
+    with open('data/ends.pkl', 'wb') as ed:
         pickle.dump(end_dicts, ed)
         print('end points saved')
 

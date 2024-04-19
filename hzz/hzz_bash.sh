@@ -1,21 +1,43 @@
 #!/bin/bash
 
-# Function to run the worker script
-run_worker() {
-    rank=$1
-    python worker/hzz_script.py --rank $rank
+# Function to build counter container
+build_counter() {
+    docker build -t counter_image ./counter/
+    docker run --name counter_container -v "./data:/app/data" counter_image python hzz_counter.py --number_workers "$1"
 }
 
-# Get input argument
-n=$1
+# Function to build worker containers
+build_worker() {
+    docker build -t worker_image ./worker/
+    for ((i = 0; i < $1; i++)); do
+        docker run -d --name worker_container_$i -v "./data:/app/data" worker_image python hzz_script.py --rank "$i"
+    done
+}
 
-# Run the counter script
-python counter/hzz_counter.py --number_workers $n
+# Function to build collector container
+build_collector() {
+    docker build -t collector_image ./collector/
+    docker run -d --name collector_container -v "./data:/app/data" collector_image python hzz_collector.py
+}
 
-# Run worker scripts with ranks 0 to n-1
-for ((rank=0; rank<n; rank++)); do
-    run_worker $rank
-done
+# Main function
+main() {
+    # Check if the number of arguments is correct
+    if [ "$#" -ne 1 ]; then
+        echo "Usage: $0 <number_of_workers>"
+        exit 1
+    fi
 
-# Run the collector script
-python collector/hzz_collector.py
+    # Build counter container
+    build_counter "$1"
+
+    # Build worker containers
+    build_worker "$(( $1 - 1 ))"
+
+    # Build collector container
+    build_collector "$1"
+}
+
+# Run the main function with provided argument
+main "$@"
+

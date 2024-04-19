@@ -43,5 +43,5 @@ networks:
     driver_opts:
       type: none
       device: /data
-      o: bind
+      opt: bind
 
