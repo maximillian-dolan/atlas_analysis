@@ -19,7 +19,7 @@ First create docker swarm on manager node using:
 ```
 $ docker swarm init
 ```
-Then add each worker node using worker-join token, before running:
+Then add each worker node using worker-join token, before running on the manager node:
 ```
 $ ./hzz_swarm.sh
 ```
