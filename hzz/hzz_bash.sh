@@ -9,7 +9,7 @@ build_counter() {
 # Function to build worker containers
 build_worker() {
     docker build -t worker_image ./worker/
-    for ((i = 0; i < $1; i++)); do
+    for ((i = 0; i < $1+1; i++)); do
         docker run -d --name worker_container_$i -v "./data:/app/data" worker_image python hzz_script.py --rank "$i"
     done
 }
