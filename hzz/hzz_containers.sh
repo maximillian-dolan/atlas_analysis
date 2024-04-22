@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Remove the current saved plot
+rm data/graph.png
+
+# Record the start time
+start_time=$(date +%s)
+
 # Function to build counter container
 build_counter() {
     docker build -t counter_image ./counter/
@@ -41,3 +47,11 @@ main() {
 # Run the main function with provided argument
 main "$@"
 
+# Record end time when plot is actually produced
+while [ ! -f data/graph.png ]; do
+    sleep 1
+done
+end_time=$(date +%s)
+
+duration=$((end_time - start_time))
+echo "Total time taken for analysis: $duration seconds."
