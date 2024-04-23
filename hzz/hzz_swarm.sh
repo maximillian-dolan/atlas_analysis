@@ -21,7 +21,7 @@ docker service create --name counter --constraint "node.id==$manager_id" --mount
 docker service create --name collector --constraint "node.id==$manager_id" --mount type=volume,source=shared_volume,target=/app/data collector_image python hzz_collector.py
 
 # Create service for relevant rank on each worker node
-for ((i = 0; i < n+1; i++)); do
+for ((i = 0; i < n; i++)); do
 
     worker_id=$(docker node ls | grep -nv "Leader" | sed -n "$((i+1))p" | awk '{print $1}' | cut -d ':' -f 2)
     docker service create --name worker_$i --constraint "node.id==$worker_id" --mount type=volume,source=shared_data,target=/app/data worker_image python hzz_script.py --rank $i
