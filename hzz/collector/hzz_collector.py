@@ -92,9 +92,6 @@ for pkl_file in pkl_files:
         globals()[var_name] = pickle.load(file)
         ak_list.append(globals()[var_name])
 
-#print(ak_list)
-#print('=============================')
-
 # Combine all the data
 result_dict = {}
 
@@ -102,12 +99,10 @@ result_dict = {}
 for key in data_0.keys():
     # Extract the arrays corresponding to the current key from all dictionaries
     arrays = [d[key] for d in ak_list]
+
     # Concatenate
     concatenated_array = ak.concatenate(arrays, axis=0)
     result_dict[key] = concatenated_array
-
-# Now 'result_dict' contains the sums of corresponding awkward arrays from all dictionaries
-#print(result_dict)
 
 #===================================================================================
 # Function to plot data
