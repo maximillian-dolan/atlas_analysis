@@ -4,14 +4,31 @@ First navigate to hzz directory with:
 ```
 $ cd hzz
 ```
+## To run scripts on their own
+
+```
+$ python counter/hzz_counter.py --number_workers <number of divisions>
+
+# Run for rank 0 up to rank number_workers-1
+$ python worker/hzz_script.py --rank <rank>
+
+$ python collector/hzz_collector.py
+```
+Alternatively you can run from the bash script:
+```
+$ hzz_bash.sh <number divisions>
+```
 
 ## To run with docker containarisation
 
 Run:
 ```
-$ ./hzz_bash.sh <number divisions>
+$ ./hzz_containers.sh <number divisions>
 ```
-This will run the code as several containers, final plot will be saved within data and not automatically shown.
+This will run the code as several containers, final plot will be saved within data and not automatically shown. To delete all images once containers have finished running, use:
+```
+$ docker rmi -f $(docker images -aq)
+```
 
 ## To run and deploy with docker swarm
 
