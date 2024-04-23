@@ -3,13 +3,8 @@
 ###########################
 
 # Get the number of worker nodes
-n=$(docker node ls | grep -vc "Leader") - 1
-
-# Give each worker node a rank
-for ((i = 0; i < n+1; i++)); do
-    worker_id=$(docker node ls | grep -nv "Leader" | sed -n "$((2))p" | awk '{print $1}' | cut -d ':' -f 2)
-    docker node update --label-add rank=$i $worker_id
-done
+n=$(( $(docker node ls | grep -vc "Leader") - 1 ))
+echo "$n worker nodes"
 
 # Build images
 docker build -t counter_image ./counter/
@@ -28,8 +23,7 @@ docker service create --name collector --constraint "node.id==$manager_id" --mou
 # Create service for relevant rank on each worker node
 for ((i = 0; i < n+1; i++)); do
 
-    worker_id=$(docker node ls | grep -nv "Leader" | sed -n "$((2))p" | awk '{print $1}' | cut -d ':' -f 2)
-    rank=$(docker node inspect --format '{{ index .Spec.Labels "rank" }}' $worker_id)
+    worker_id=$(docker node ls | grep -nv "Leader" | sed -n "$((i+1))p" | awk '{print $1}' | cut -d ':' -f 2)
+    docker service create --name worker_$i --constraint "node.id==$worker_id" --mount type=volume,source=shared_data,target=/app/data worker_image python hzz_script.py --rank $i
 
-    docker service create --name worker_$i --constraint "node.id==$worker_id" --env RANK=$rank --mount type=volume,source=shared_data,target=/app/data worker_image python hzz_script.py --rank $rank
 done
