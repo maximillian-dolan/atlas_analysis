@@ -15,6 +15,12 @@ run_worker() {
 # Get input argument
 n=$1
 
+# Check if the number of arguments is correct
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <number_of_workers>"
+    exit 1
+fi
+
 # Run the counter script
 python counter/hzz_counter.py --number_workers $n
 

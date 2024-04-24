@@ -232,7 +232,7 @@ def plot_data(data):
     main_axes.legend( frameon=False ) # no box around the legend
 
     plt.savefig('data/graph.png')
-    plt.show()
+    #plt.show()
 
 def main(): 
     print('Collecting data')

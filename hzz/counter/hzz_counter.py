@@ -128,7 +128,7 @@ def split_dictionary(original_dict, n):
             for i in range(1,n+1):
                 output_dicts[i].setdefault(category, {})[key] = split_values[i-1]
     
-    # Make dictionaries to be cumulative
+    # Make dictionaries cumulative
     for i in range(1,n+1):
         output_dicts[i] = add_dictionaries(output_dicts[i-1],output_dicts[i])
 
@@ -145,7 +145,7 @@ def split_dictionary(original_dict, n):
         return start_dicts, end_dicts
 
     else:
-        raise ValueError('End verification failed')
+        raise ValueError('End verification failed, split dictionaries do not add up to original')
 
 def main():
 
